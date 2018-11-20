@@ -108,10 +108,10 @@ int main(int argc, char *argv[]){
 
 
 
-		if (found){
-			(*cmd_ptr)(parameter, currStep, &imageInfo, &undoBuffer);
-		}
-
+		if (found){													  //********HIBA********
+			(*cmd_ptr)(parameter, currStep, &imageInfo, &undoBuffer); //a cmd pointer beállítódik a jó értékre, azt ellenőrizem
+		}															  //de bármelyik függvényt hívja meg, core dump van mielőtt az
+																      //első sora lefutna...
 		else
 			pushmsg("invalid command");
 	}
