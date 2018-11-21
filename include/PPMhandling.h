@@ -20,7 +20,7 @@ typedef struct{
 bool IsPPM(FILE *imgfile);
 Info PPM_GetInfo(FILE *imgfile);
 void PPM_LoadImageToArray(FILE *imgfile, Info imgInfo, Pixel *image);
-void PPM_NextStep(Info imgInfo, int currStep, Pixel ***undoBuffer);
+void PPM_NextStep(Info imgInfo, int currStep, Pixel **undoBuffer);
 void PPM_Darken(Pixel *img, int amount, Info imgInfo);
 void PPM_Lighten(Pixel *img, int amount, Info imgInfo);
 void PPM_Invert(Pixel*img, Info imgInfo);

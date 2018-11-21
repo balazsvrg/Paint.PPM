@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
 	int bufferLen;
 	SDL_Renderer *renderer = NULL;
 	
-	void *(*cmd_ptr)(char *, int, Info *, Pixel ***) = NULL;
+	void *(*cmd_ptr)(char *, int , Info, Pixel **) = NULL;
 
 	const Command commandList[20] = {{.id = "darken", .func = &Darken},
                            		{.id = "brighten", .func = &Lighten},
@@ -61,6 +61,8 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
+	printf("%d", bufferLen);
+
 	while (1){ // ezt most itt szabad, mert van exit command
 		char input[200];
 		char command[50];
@@ -72,14 +74,10 @@ int main(int argc, char *argv[]){
 			currStep++;
 		currStep -= 1;
 
-		if (currStep == bufferLen){ //undoBuffer shiftelése, ha megtelik
-			for (int i = 0; i < bufferLen; i++){
-				if (i == bufferLen -1)
-					undoBuffer[i] = NULL;
+		printf("%d\n", currStep );
 
-				else
-					undoBuffer[i] = undoBuffer[i+1];
-			}
+		if (currStep == bufferLen){ //undoBuffer shiftelése, ha megtelik
+			//TODO
 		}
 
 		if (renderer == NULL && undoBuffer[currStep] != NULL){
@@ -104,16 +102,13 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-				printf("%p\n%p\n", cmd_ptr, &undoBuffer);
-
-
-
 		if (found){													  //********HIBA********
-			(*cmd_ptr)(parameter, currStep, &imageInfo, &undoBuffer); //a cmd pointer beállítódik a jó értékre, azt ellenőrizem
+			(*cmd_ptr)(parameter, currStep, imageInfo, undoBuffer);  //a cmd pointer beállítódik a jó értékre, azt ellenőrizem
 		}															  //de bármelyik függvényt hívja meg, core dump van mielőtt az
 																      //első sora lefutna...
 		else
 			pushmsg("invalid command");
+
 	}
 
 	free(undoBuffer);

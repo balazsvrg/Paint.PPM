@@ -11,12 +11,12 @@ typedef struct Command{
 
 void GetCommand(char *);
 void SeparateCommandLine(char *input, char *command, char *argument);
-void Darken(char *amount,  int currStep, Info imgInfo, Pixel ***undoBuffer);
-void Lighten(char *amount,  int currStep, Info imgInfo, Pixel ***undoBuffer);
-void Invert(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel ***undoBuffer);
-void Greyscale(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel ***undoBuffer);
-void Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel ***undoBuffer);
-void Save(char *path, Pixel **img, Info imgInfo);
-void ExitProgram(char *mustTakeArgument, Pixel **img, Info imgInfo);
+bool Darken(char *amount,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
+bool Lighten(char *amount,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
+bool Invert(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
+bool Greyscale(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
+bool Contrast(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
+bool Save(char *path, Pixel **img, Info boolimgInfo);
+bool ExitProgram(char *mustTakeArgument, Pixel **img, Info boolimgInfo);
 
 #endif

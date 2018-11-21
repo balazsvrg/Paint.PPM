@@ -40,45 +40,48 @@ void SeparateCommandLine(char *input, char *command, char *argument){ //Szétsze
 	}
 }
 
-void Darken(char *amount, int currStep, Info imgInfo, Pixel ***undoBuffer){
-	printf("I work");
+bool Darken(char *amount, int currStep, Info imgInfo, Pixel **undoBuffer){
 	int value = atoi(amount);
-	printf("I work too");
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
-	printf("next step does too");
 	if (value >= 0 && value <= 255){
-		PPM_Darken(*undoBuffer[currStep +1], value, imgInfo);
+		PPM_Darken(undoBuffer[currStep +1], value, imgInfo);
 	}
 	else
 		pushmsg("cannot Darken by that amount");
+
+	return true;
 }
 
-void Lighten(char *amount,  int currStep, Info imgInfo, Pixel ***undoBuffer){
+bool Lighten(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	int value = atoi(amount);
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
 	if (value >= 0 && value <= 255){
-		PPM_Lighten(*undoBuffer[currStep +1], value, imgInfo);
+		PPM_Lighten(undoBuffer[currStep +1], value, imgInfo);
 	}
 	else
 		pushmsg("cannot Lighten by that amount");
+	return true;
 }
 
-void Invert(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel ***undoBuffer){
+bool Invert(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
-	PPM_Invert(*undoBuffer[currStep +1], imgInfo);
+	PPM_Invert(undoBuffer[currStep +1], imgInfo);
+	return true;
 }
 
-void Greyscale(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel ***undoBuffer){
+bool Greyscale(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
-	PPM_Greyscale(*undoBuffer[currStep +1], imgInfo);
+	PPM_Greyscale(undoBuffer[currStep +1], imgInfo);
+	return true;
 }
 
-void Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel ***undoBuffer){
+bool Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
-	PPM_Contrast(*undoBuffer[currStep +1],imgInfo);
+	PPM_Contrast(undoBuffer[currStep +1],imgInfo);
+	return true;
 }
 
-void Save(char *path, Pixel **img, Info imgInfo){
+bool Save(char *path, Pixel **img, Info imgInfo){
 	FILE *fp;
 	fp = fopen(path, "w");
 	fprintf(fp, "P6\n %d %d\n%d\n",imgInfo.width, imgInfo.height, imgInfo.maxColorVal);
@@ -89,9 +92,10 @@ void Save(char *path, Pixel **img, Info imgInfo){
 	}
 
 	fclose(fp);
+	return false;
 }
 
-void ExitProgram(char *mustTakeArgument, Pixel **img, Info imgInfo){ //kilép a programból (megszakítja a végtelen ciklust)
+bool ExitProgram(char *mustTakeArgument, Pixel **img, Info imgInfo){ //kilép a programból (megszakítja a végtelen ciklust)
 
 	if (*img != NULL)
 		free(*img);
