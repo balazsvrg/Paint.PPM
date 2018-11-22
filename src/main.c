@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
                                 {.id = "save", .func = &Save},
                            		{.id = "end", .func = NULL}};
 
-	if (argc == 2 || argc == 4 || argc == 5){
+	if ((argc == 2 && strcmp(argv[1], "help") != 0) || argc == 4 || argc == 5){
 		FILE *fp;
 		fp = fopen(argv[1], "r");
 
@@ -73,9 +73,10 @@ int main(int argc, char *argv[]){
 			}
 
 			cmd_ptr = InterpretCommand(commandList, commandin, &cmd_ptr);
-			if (cmd_ptr != NULL)
-				(*cmd_ptr)(parameter, 0, imageInfo, undoBuffer);
-			Save(savepath, 1, imageInfo, undoBuffer);
+			if (cmd_ptr != NULL){
+				(*cmd_ptr)(parameter, 1, imageInfo, undoBuffer);
+			}
+			Save(savepath, 2, imageInfo, undoBuffer);
 
 			free(undoBuffer[0]);
 			free(undoBuffer[1]);

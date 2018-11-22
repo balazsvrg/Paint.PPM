@@ -56,7 +56,7 @@ void *InterpretCommand(const Command *commandList, char *command, void *cmd_ptr)
 	return cmd_ptr;
 }
 
-bool Darken(char *amount, int currStep, Info imgInfo, Pixel **undoBuffer){
+void Darken(char *amount, int currStep, Info imgInfo, Pixel **undoBuffer){
 	int value = atoi(amount);
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
 	if (value >= 0 && value <= 255){
@@ -65,10 +65,9 @@ bool Darken(char *amount, int currStep, Info imgInfo, Pixel **undoBuffer){
 	else
 		pushmsg("cannot Darken by that amount");
 
-	return true;
-}
+	}
 
-bool Lighten(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer){
+void Lighten(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	int value = atoi(amount);
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
 	if (value >= 0 && value <= 255){
@@ -76,58 +75,55 @@ bool Lighten(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	}
 	else
 		pushmsg("cannot Lighten by that amount");
-	return true;
-}
+	}
 
-bool Invert(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
+void Invert(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
 	PPM_Invert(undoBuffer[currStep], imgInfo);
-	return true;
-}
+	}
 
-bool Greyscale(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
+void Greyscale(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
 	PPM_Greyscale(undoBuffer[currStep], imgInfo);
-	return true;
-}
+	}
 
-bool Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
+void Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
 	PPM_Contrast(undoBuffer[currStep],imgInfo);
-	return true;
 }
 
-bool Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
+void Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	if (currStep != 1)
 		undoBuffer[currStep -1] = NULL;
 
 	else
 		pushmsg("undo buffer is empty");
-	return false;
+	
 }
 
-bool Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer){
+void Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer){
 	if (strcmp(path, "") != 0){
 		FILE *fp;
 		fp = fopen(path, "w");
+
 		fprintf(fp, "P6\n %d %d\n%d\n",imgInfo.width, imgInfo.height, imgInfo.maxColorVal);
 		for (int i = 0; i <imgInfo.height * imgInfo.width; i++){
-			fputc(undoBuffer[currStep][i].r, fp);
-			fputc(undoBuffer[currStep][i].g, fp);
-			fputc(undoBuffer[currStep][i].b, fp);
+			fputc(undoBuffer[currStep-1][i].r, fp);
+			fputc(undoBuffer[currStep-1][i].g, fp);
+			fputc(undoBuffer[currStep-1][i].b, fp);
 		}
 
 		fclose(fp);
-		return false;
+		
 	}
 
 	else{
 		pushmsg("path needed to save");
-		return false;
+		
 	}
 }
 
-bool ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){ //kilép a programból (megszakítja a végtelen ciklust)
+void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){ //kilép a programból (megszakítja a végtelen ciklust)
 
 	for (int i = 0; i <= currStep; ++i)
 	{
@@ -135,5 +131,5 @@ bool ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **un
 	}
 
 	run = false;
-	return false;
+	
 }
