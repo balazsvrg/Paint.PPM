@@ -8,7 +8,7 @@ typedef struct{
 }Pixel;
 
 typedef struct{
-	int width, height, maxColorVal;
+	int width, height, maxColorVal, size;
 }Info;
 
 typedef struct{
@@ -26,5 +26,6 @@ void PPM_Lighten(Pixel *img, int amount, Info imgInfo);
 void PPM_Invert(Pixel*img, Info imgInfo);
 void PPM_Greyscale(Pixel *img, Info imgInfo);
 void PPM_Contrast(Pixel *img, Info imgInfo);
+void PPM_Blur(int size, Pixel *img, Info imgInfo);
 
 #endif

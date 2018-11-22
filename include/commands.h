@@ -17,6 +17,7 @@ void Lighten(char *amount,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
 void Invert(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
 void Greyscale(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
 void Contrast(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **undoBuffer);
+void Blur(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer);
 void Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer);
 void Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer);
 void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer);

@@ -27,6 +27,7 @@ int main(int argc, char *argv[]){
                            		{.id = "invert", .func = &Invert},
                            		{.id = "greyscale", .func = &Greyscale},
                            		{.id = "contrast", .func = &Contrast},
+                           		{.id = "blur", .func = &Blur},
                            		{.id = "undo", .func = &Undo},
                                 {.id = "exit", .func = &ExitProgram},
                                 {.id = "save", .func = &Save},
@@ -39,13 +40,13 @@ int main(int argc, char *argv[]){
 		if (fp != NULL){
 			if (IsPPM(fp)){
 				imageInfo = PPM_GetInfo(fp);
-				bufferLen = (maxMem * 1024 *1024) / (sizeof(Pixel) * imageInfo.width * imageInfo.height);
+				bufferLen = (maxMem * 1024 *1024) / (sizeof(Pixel) * imageInfo.width * imageInfo.size);
 				undoBuffer = (Pixel **)malloc(sizeof(Pixel **) * bufferLen); //lefoglal egy annyi elemű tömböt, ahányszor a kép belefér az általunk meghatározott maximális ramhasználatba
 				for (int i = 0; i < bufferLen; i++){
 					undoBuffer[i] = NULL;	
 				}
 
-				undoBuffer[0] = (Pixel *) malloc(sizeof(Pixel) * imageInfo.width * imageInfo.height); // FREEEEEEEEEEEEE
+				undoBuffer[0] = (Pixel *) malloc(sizeof(Pixel) * imageInfo.size); // FREEEEEEEEEEEEE
 
 				if (undoBuffer[0] == NULL)
 					printf("couldn't allocate memory");
@@ -63,6 +64,7 @@ int main(int argc, char *argv[]){
 		if (argc == 4 || argc == 5){
 			char *commandin = argv[2];
 			char *parameter = NULL;
+
 			char *savepath;
 			if (argc == 4){
 				savepath = argv[3];
@@ -106,7 +108,6 @@ int main(int argc, char *argv[]){
 		}
 
 		if (currStep == bufferLen -2){ //undoBuffer shiftelése, ha megtelik
-			printf("%s\n", "gecc");
 			free(undoBuffer[0]);
 			for (int i = 0; i < currStep - 1; ++i)
 			{
@@ -119,10 +120,16 @@ int main(int argc, char *argv[]){
 
 		printf("Paint.PPM: ");
 
+		printf("ez még lefut");
+
 		GetCommand(input); //mégsem a scanf(" %s")-t használom mert picit furán viselkedett, ez most így jó
 		SeparateCommandLine(input, command, parameter); //szétszedi space-nél a commandot és a paramétert
 
+		printf("ez már nem");
+
 		cmd_ptr = InterpretCommand(commandList, command, &cmd_ptr);
+
+
 
 		if (cmd_ptr != NULL)
 			(*cmd_ptr)(parameter, currStep, imageInfo, undoBuffer);  	

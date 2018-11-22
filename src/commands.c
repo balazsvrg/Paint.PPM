@@ -92,6 +92,12 @@ void Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoB
 	PPM_Contrast(undoBuffer[currStep],imgInfo);
 }
 
+void Blur(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer){
+	int size = atoi(amount);
+	PPM_NextStep(imgInfo, currStep, undoBuffer);
+	PPM_Blur(size, undoBuffer[currStep],imgInfo);
+}
+
 void Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
 	if (currStep != 1)
 		undoBuffer[currStep -1] = NULL;
@@ -125,8 +131,7 @@ void Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer){
 
 void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){ //kilép a programból (megszakítja a végtelen ciklust)
 
-	for (int i = 0; i <= currStep; ++i)
-	{
+	for (int i = 0; i <= currStep; ++i){
 		free(undoBuffer[i]);
 	}
 

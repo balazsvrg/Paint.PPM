@@ -14,6 +14,7 @@ bool IsPPM(FILE *imgfile){ //jelez, ha rossz formátumú képet próbálnánk me
 Info PPM_GetInfo(FILE *imgfile){ //visszatér a PPM méreteivel, és a maximális színértékkel
 	Info imageInfo;
 	fscanf(imgfile, "%d%d%d\n", &imageInfo.width, &imageInfo.height, &imageInfo.maxColorVal);
+	imageInfo.size = imageInfo.width * imageInfo.height;
 	return imageInfo;
 }
 
@@ -133,8 +134,45 @@ void PPM_Contrast(Pixel *img, Info imgInfo){
 		pushmsg("Contrast cannot be stretched, as this is a monochrome picture");
 }
 
-void Blur(Pixel *img, Info imgInfo){
+void CopyToTemp(Pixel *temp, Info imgInfo, Pixel *from){
+	for (int i = 0; i < imgInfo.size; ++i){
+		temp[i] = from[i];
+	}
+}
 
+Pixel AvgConvMtx(int rect, Pixel *tmp, int count, Info imageInfo){
+	int rval;
+	int gval;
+	int bval;
+
+	Pixel ToReturn;
+
+	for (int i = rect; i < rect; ++i){
+		for (int j = rect; j < rect; ++j){
+			if ((count + j) % imageInfo.width == count % imageInfo.width){ // ha nem lóg ki oldalra
+				if (count - imageInfo.width * i > 0 || count + imageInfo.width * i < imageInfo.height ){ //és függőlegesen sem
+					int coord = count - j - imageInfo.width * i;
+					rval += tmp[coord].r;
+					gval += tmp[coord].g;
+					bval += tmp[coord].b;
+				}
+			}
+		}
+	}
+
+	ToReturn.r = rval / (count * count);
+	ToReturn.g = gval / (count * count);
+	ToReturn.b = bval / (count * count);
+
+	return ToReturn;
+}
+
+void PPM_Blur(int size, Pixel *img, Info imgInfo){
+	Pixel *temp = (Pixel *) malloc(sizeof(Pixel) * imgInfo.size);
+	CopyToTemp(temp, imgInfo, img);
+	for (int i = 0; i < imgInfo.size; ++i){
+		img[i] = AvgConvMtx(size, temp, i, imgInfo);
+	}
 }
 
 
