@@ -40,6 +40,19 @@ void SeparateCommandLine(char *input, char *command, char *argument){ //Szétsze
 	}
 }
 
+void *InterpretCommand(const Command *commandList, char *command, void *cmd_ptr){
+	for (int i = 0; commandList[i].func != NULL; i++){
+		if(strcmp(command, commandList[i].id) == 0){
+			cmd_ptr = commandList[i].func;
+		}
+	}												  
+	
+	if (cmd_ptr == NULL)
+		pushmsg("invalid command");
+
+	return cmd_ptr;
+}
+
 bool Darken(char *amount, int currStep, Info imgInfo, Pixel **undoBuffer){
 	int value = atoi(amount);
 	PPM_NextStep(imgInfo, currStep, undoBuffer);
@@ -81,18 +94,25 @@ bool Contrast(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoB
 	return true;
 }
 
-bool Save(char *path, Pixel **img, Info imgInfo){
-	FILE *fp;
-	fp = fopen(path, "w");
-	fprintf(fp, "P6\n %d %d\n%d\n",imgInfo.width, imgInfo.height, imgInfo.maxColorVal);
-	for (int i = 0; i <imgInfo.height * imgInfo.width; i++){
-		fputc(img[i]->r, fp);
-		fputc(img[i]->g, fp);
-		fputc(img[i]->b, fp);
+bool Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer){
+	if (strcmp(path, "") != 0){
+		FILE *fp;
+		fp = fopen(path, "w");
+		fprintf(fp, "P6\n %d %d\n%d\n",imgInfo.width, imgInfo.height, imgInfo.maxColorVal);
+		for (int i = 0; i <imgInfo.height * imgInfo.width; i++){
+			fputc(undoBuffer[currStep][i].r, fp);
+			fputc(undoBuffer[currStep][i].g, fp);
+			fputc(undoBuffer[currStep][i].b, fp);
+		}
+
+		fclose(fp);
+		return false;
 	}
 
-	fclose(fp);
-	return false;
+	else{
+		pushmsg("path needed to save");
+		return false;
+	}
 }
 
 bool ExitProgram(char *mustTakeArgument, Pixel **img, Info imgInfo){ //kilép a programból (megszakítja a végtelen ciklust)

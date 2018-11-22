@@ -97,14 +97,14 @@ void PPM_Contrast(Pixel *img, Info imgInfo){
 			histogram.histB[img[index].b] += 1;
 		}
 	}
-	while (((((histogram.histR[min] + histogram.histG[min] + histogram.histB[min])/3) +    			
-		(histogram.histR[min +1] + histogram.histG[min +1] + histogram.histB[min +1])/3) + 			
-		(histogram.histR[min +2] + histogram.histG[min +2] + histogram.histB[min +2])/3)/3 < 50)	
+
+	while ((((histogram.histR[min +1] + histogram.histG[min +1] + histogram.histB[min +1])/3) -
+			(histogram.histR[min] + histogram.histG[min] + histogram.histB[min])/3)  < (imgInfo.width * imgInfo.height) * 0.001)	
 		min++;
 
-	while (((((histogram.histR[max] - histogram.histG[max] - histogram.histB[max])/3) + 
-		(histogram.histR[max -1] - histogram.histG[max -1] - histogram.histB[max -1])/3) + 
-		(histogram.histR[max -2] - histogram.histG[max -2] - histogram.histB[max -2])/3)/3 < 50)
+
+	while ((((histogram.histR[max -1] + histogram.histG[max -1] + histogram.histB[max -1])/3) -
+			(histogram.histR[max] + histogram.histG[max] + histogram.histB[max])/3)  < (imgInfo.width * imgInfo.height) * 0.001)	
 		max--;
 
 	if (max - min != 0){
