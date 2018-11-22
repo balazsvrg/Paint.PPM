@@ -28,10 +28,10 @@ void PPM_LoadImageToArray(FILE *imgfile, Info imgInfo, Pixel *img){ //lefoglal e
 }
 
 void PPM_NextStep(Info imgInfo, int currStep, Pixel **undoBuffer){
-	undoBuffer[currStep + 1] = (Pixel *) malloc(sizeof(Pixel) * imgInfo.width * imgInfo.height);
+	undoBuffer[currStep] = (Pixel *) malloc(sizeof(Pixel) * imgInfo.width * imgInfo.height);
 	for (int i = 0; i < imgInfo.width; ++i)
 		for (int j = 0; j < imgInfo.height; ++j)
-			undoBuffer[currStep + 1][i * imgInfo.height + j] = undoBuffer[currStep][i * imgInfo.height + j];
+			undoBuffer[currStep][i * imgInfo.height + j] = undoBuffer[currStep-1][i * imgInfo.height + j];
 }
 
 void PPM_Darken(Pixel *img, int amount, Info imgInfo){

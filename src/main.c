@@ -8,6 +8,7 @@
 #include "../include/PPMhandling.h"
 #include "../include/updates.h"
 
+bool run = true;
 
 int main(int argc, char *argv[]){
 	Info imageInfo;
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]){
                            		{.id = "invert", .func = &Invert},
                            		{.id = "greyscale", .func = &Greyscale},
                            		{.id = "contrast", .func = &Contrast},
+                           		{.id = "undo", .func = &Undo},
                                 {.id = "exit", .func = &ExitProgram},
                                 {.id = "save", .func = &Save},
                            		{.id = "end", .func = NULL}};
@@ -74,6 +76,10 @@ int main(int argc, char *argv[]){
 			if (cmd_ptr != NULL)
 				(*cmd_ptr)(parameter, 0, imageInfo, undoBuffer);
 			Save(savepath, 1, imageInfo, undoBuffer);
+
+			free(undoBuffer[0]);
+			free(undoBuffer[1]);
+			free(undoBuffer);
 			return 0;
 		}
 	}
@@ -82,36 +88,38 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-	printf("%d", bufferLen);
-
-	while (1){ // ezt most itt szabad, mert van exit command
+	while (run){ // ezt most itt szabad, mert van exit command
 		char input[200] = "";
 
 		int currStep = 0;
 		while (undoBuffer[currStep] != NULL)
 			currStep++;
-		currStep -= 1;
 
-		printf("%d\n", currStep );
-
-		if (currStep == bufferLen){ //undoBuffer shiftelése, ha megtelik
-			//TODO
-		}
-
-		if (renderer == NULL && undoBuffer[currStep] != NULL){
+		if (renderer == NULL && undoBuffer[currStep-1] != NULL){
 			renderer = SYSTEM_SDLSetup(imageInfo);
 		}
 
 		if (renderer != NULL){
-			SDLupdate(renderer, imageInfo, undoBuffer[currStep]);
+			SDLupdate(renderer, imageInfo, undoBuffer[currStep-1]);
 			SDLrender(renderer);
+		}
+
+		if (currStep == bufferLen -2){ //undoBuffer shiftelése, ha megtelik
+			printf("%s\n", "gecc");
+			free(undoBuffer[0]);
+			for (int i = 0; i < currStep - 1; ++i)
+			{
+				undoBuffer[i] = undoBuffer [i + 1];
+			}
+
+			undoBuffer[currStep-1] = NULL;
+			currStep -= 1;
 		}
 
 		printf("Paint.PPM: ");
 
 		GetCommand(input); //mégsem a scanf(" %s")-t használom mert picit furán viselkedett, ez most így jó
 		SeparateCommandLine(input, command, parameter); //szétszedi space-nél a commandot és a paramétert
-
 
 		cmd_ptr = InterpretCommand(commandList, command, &cmd_ptr);
 
@@ -121,4 +129,5 @@ int main(int argc, char *argv[]){
 	}
 
 	free(undoBuffer);
+	return 0;
 }
