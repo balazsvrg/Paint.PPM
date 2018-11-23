@@ -8,6 +8,7 @@
 #include "../include/PPMhandling.h"
 #include "../include/updates.h"
 
+
 bool run = true;
 
 int main(int argc, char *argv[]){
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]){
 
 	char command[50];
 	char parameter[150];
-	
+
 	void *(*cmd_ptr)(char *, int , Info, Pixel **) = NULL;
 
 	const Command commandList[20] = {{.id = "darken", .func = &Darken},
@@ -40,25 +41,26 @@ int main(int argc, char *argv[]){
 		if (fp != NULL){
 			if (IsPPM(fp)){
 				imageInfo = PPM_GetInfo(fp);
-				bufferLen = (maxMem * 1024 *1024) / (sizeof(Pixel) * imageInfo.width * imageInfo.size);
+				imageInfo.size = imageInfo.width * imageInfo.height;
+				bufferLen = (maxMem * (1024 * 1024)) / (imageInfo.size * 3);
 				undoBuffer = (Pixel **)malloc(sizeof(Pixel **) * bufferLen); //lefoglal egy annyi elemű tömböt, ahányszor a kép belefér az általunk meghatározott maximális ramhasználatba
 				for (int i = 0; i < bufferLen; i++){
-					undoBuffer[i] = NULL;	
+					undoBuffer[i] = NULL;
 				}
-
-				undoBuffer[0] = (Pixel *) malloc(sizeof(Pixel) * imageInfo.size); // FREEEEEEEEEEEEE
+                Pixel *img = (Pixel *) malloc(sizeof(Pixel) * imageInfo.size);
+				undoBuffer[0] = img;
 
 				if (undoBuffer[0] == NULL)
 					printf("couldn't allocate memory");
 
-				PPM_LoadImageToArray(fp, imageInfo, undoBuffer[0]);
+			PPM_LoadImageToArray(fp, imageInfo, undoBuffer[0]);
 			}
 			else
 				pushmsg("File is not a PPM");
-			
+
 			fclose(fp);
 		}
-		else 
+		else
 			pushmsg("Error opening image");
 
 		if (argc == 4 || argc == 5){
@@ -120,19 +122,13 @@ int main(int argc, char *argv[]){
 
 		printf("Paint.PPM: ");
 
-		printf("ez még lefut");
-
 		GetCommand(input); //mégsem a scanf(" %s")-t használom mert picit furán viselkedett, ez most így jó
 		SeparateCommandLine(input, command, parameter); //szétszedi space-nél a commandot és a paramétert
 
-		printf("ez már nem");
-
 		cmd_ptr = InterpretCommand(commandList, command, &cmd_ptr);
 
-
-
 		if (cmd_ptr != NULL)
-			(*cmd_ptr)(parameter, currStep, imageInfo, undoBuffer);  	
+			(*cmd_ptr)(parameter, currStep, imageInfo, undoBuffer);
 
 	}
 
