@@ -1,6 +1,9 @@
 #include <stdio.h>
+
+#ifdef __linux
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+#endif
 
 #include "../include/PPMhandling.h"
 
@@ -8,6 +11,7 @@ void pushmsg(char *msg){ //kiír a stdout-ra egy Paint.PPN taggal
 	printf("Paint.PPM: %s\n", msg);
 }
 
+#ifdef __linux
 SDL_Renderer *SYSTEM_SDLSetup(Info imageInfo){
 	SDL_Window *window = SDL_CreateWindow("Paint.PPM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, imageInfo.width, imageInfo.height, 0);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
@@ -26,3 +30,4 @@ void SDLupdate(SDL_Renderer *renderer, Info imageInfo, Pixel *img){
 void SDLrender(SDL_Renderer *renderer){
 	SDL_RenderPresent(renderer);
 }
+#endif

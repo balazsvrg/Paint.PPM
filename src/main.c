@@ -2,7 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+#ifdef __linux
 #include <SDL2/SDL.h>
+#endif
 
 #include "../include/commands.h"
 #include "../include/PPMhandling.h"
@@ -16,7 +19,11 @@ int main(int argc, char *argv[]){
 	int maxMem = 64; //maximum ram for the undo buffer in megabytes
 	Pixel **undoBuffer = NULL;
 	int bufferLen;
+
+
+	#ifdef __linux
 	SDL_Renderer *renderer = NULL;
+	#endif
 
 	char command[50];
 	char parameter[150];
@@ -100,6 +107,8 @@ int main(int argc, char *argv[]){
 		while (undoBuffer[currStep] != NULL)
 			currStep++;
 
+
+		#ifdef __linux
 		if (renderer == NULL && undoBuffer[currStep-1] != NULL){
 			renderer = SYSTEM_SDLSetup(imageInfo);
 		}
@@ -108,6 +117,7 @@ int main(int argc, char *argv[]){
 			SDLupdate(renderer, imageInfo, undoBuffer[currStep-1]);
 			SDLrender(renderer);
 		}
+		#endif
 
 		if (currStep == bufferLen -2){ //undoBuffer shiftelése, ha megtelik
 			free(undoBuffer[0]);
