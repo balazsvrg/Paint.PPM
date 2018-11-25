@@ -108,7 +108,7 @@ void Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffe
 }
 
 void Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer){
-	if (strcmp(path, "") != 0){
+	if (strcmp(path, "") != 0 && currStep > 1){
 		FILE *fp;
 		fp = fopen(path, "w");
 
@@ -135,7 +135,7 @@ void Help(char *NotUsed,  int NotUsed2, Info NotUsed3, Pixel **NotUsed4){
 	fp = fopen("helptextlin", "r");
 	#endif
 	#ifndef __linux
-	fp = fopen("..\\helptextwin.txt", "r");
+	fp = fopen("helptextwin.txt", "r");
 	#endif
 	if (fp == NULL)
 		pushmsg("cannot open helpfile");
@@ -153,12 +153,7 @@ void Help(char *NotUsed,  int NotUsed2, Info NotUsed3, Pixel **NotUsed4){
 	}
 }
 
-void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){ //kilép a programból (megszakítja a végtelen ciklust)
-
-	for (int i = 0; i <= currStep; ++i){
-		free(undoBuffer[i]);
-	}
-
+void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){ //kilép a programból (megszakítja a végtelen ciklust)	
 	run = false;
 	
 }

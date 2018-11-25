@@ -16,9 +16,10 @@ bool run = true;
 
 int main(int argc, char *argv[]){
 	Info imageInfo;
-	int maxMem = 64; //maximum ram for the undo buffer in megabytes
+	int maxMem = 64; /*maximum ram az UndoBuffernek, megabyteban*/
 	Pixel **undoBuffer = NULL;
 	int bufferLen;
+	int currStep;
 
 
 	#ifdef __linux
@@ -28,9 +29,9 @@ int main(int argc, char *argv[]){
 	char command[50];
 	char parameter[150];
 
-	void *(*cmd_ptr)(char *, int , Info, Pixel **) = NULL;
+	void *(*cmd_ptr)(char *, int , Info, Pixel **) = NULL; /*ez mutat minden kommand beírása után a megfelelő függvényre*/
 
-	const Command commandList[20] = {{.id = "darken", .func = &Darken},
+	const Command commandList[20] = {{.id = "darken", .func = &Darken}, 
                            		{.id = "brighten", .func = &Lighten},
                            		{.id = "invert", .func = &Invert},
                            		{.id = "greyscale", .func = &Greyscale},
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]){
 				imageInfo = PPM_GetInfo(fp);
 				imageInfo.size = imageInfo.width * imageInfo.height;
 				bufferLen = (maxMem * (1024 * 1024)) / (imageInfo.size * 3);
-				undoBuffer = (Pixel **)malloc(sizeof(Pixel **) * bufferLen); //lefoglal egy annyi elemű tömböt, ahányszor a kép belefér az általunk meghatározott maximális ramhasználatba
+				undoBuffer = (Pixel **)malloc(sizeof(Pixel **) * bufferLen); /*lefoglal egy annyi elemű tömböt, ahányszor a kép belefér az általunk meghatározott maximális ramhasználatba*/
 				for (int i = 0; i < bufferLen; i++){
 					undoBuffer[i] = NULL;
 				}
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]){
 	while (run){ // ezt most itt szabad, mert van exit command
 		char input[200] = "";
 
-		int currStep = 0;
+		currStep = 0;
 		while (undoBuffer[currStep] != NULL)
 			currStep++;
 
@@ -154,6 +155,9 @@ int main(int argc, char *argv[]){
 		strcpy(parameter, "");
 	}
 
+	for (int i = 0; i <= currStep; ++i){
+		free(undoBuffer[i]);
+	}
 	free(undoBuffer);
 	return 0;
 }

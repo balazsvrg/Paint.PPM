@@ -101,12 +101,12 @@ void PPM_Contrast(Pixel *img, Info imgInfo){
 	}
 
 	while ((((histogram.histR[min +1] + histogram.histG[min +1] + histogram.histB[min +1])/3) -
-			(histogram.histR[min] + histogram.histG[min] + histogram.histB[min])/3)  < (imgInfo.width * imgInfo.height) * 0.001)	
+			(histogram.histR[min] + histogram.histG[min] + histogram.histB[min])/3)  < (imgInfo.width * imgInfo.height) * 0.0001)	
 		min++;
 
 
 	while ((((histogram.histR[max -1] + histogram.histG[max -1] + histogram.histB[max -1])/3) -
-			(histogram.histR[max] + histogram.histG[max] + histogram.histB[max])/3)  < (imgInfo.width * imgInfo.height) * 0.001)	
+			(histogram.histR[max] + histogram.histG[max] + histogram.histB[max])/3)  < (imgInfo.width * imgInfo.height) * 0.0001)	
 		max--;
 
 	if (max - min != 0){
@@ -131,8 +131,6 @@ void PPM_Contrast(Pixel *img, Info imgInfo){
 			}
 		}
 	}
-	else
-		pushmsg("Contrast cannot be stretched, as this is a monochrome picture");
 }
 
 void CopyToTemp(Pixel **temp, Info imgInfo, Pixel *from){
@@ -152,8 +150,8 @@ Pixel AvgConvMtx(int step, Pixel **tmp, int x, int y, Info imageInfo){
 	int gval = 0;
 	int bval = 0;
 
-	for (int i = -step; i <= step; ++i){
-		for (int j = -step; j <= step; ++j){
+	for (int i = -step; i <= step; i++){
+		for (int j = -step; j <= step; j++){
 			if (y + i >= 0 && y + i < imageInfo.height){
 				if (x + j >= 0 && x + j < imageInfo.width){
 					rval += (tmp[y + i][x + j].r);
@@ -176,24 +174,18 @@ void PPM_Blur(int size, Pixel *img, Info imgInfo){
 	for (int i = 0; i < imgInfo.height; i++){
 		temp[i] = malloc(sizeof(Pixel) * imgInfo.width);
 	}
+
 	CopyToTemp(temp, imgInfo, img);
 	for (int y = 0; y < imgInfo.height; y++){
 		for (int x = 0; x < imgInfo.width; x++){
 			img[y * imgInfo.height + x] = AvgConvMtx(size, temp, x, y, imgInfo);
+		}
+	}
 
-		}
-	}
-	CopyToTemp(temp, imgInfo, img);
-	for (int x = 0; x < imgInfo.width; x++){
-		for (int y = 0; y < imgInfo.height; y++){
-			img[y * imgInfo.height + x] = AvgConvMtx(size, temp, x, y, imgInfo);
-		}
-	}
-/*
 	for (int i = 0; i < imgInfo.height; i++)
 		free(temp[i]);
 
-	free(temp);*/
+	free(temp);
 }
 
 
