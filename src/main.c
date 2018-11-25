@@ -54,14 +54,20 @@ int main(int argc, char *argv[]){
 				imageInfo.size = imageInfo.width * imageInfo.height;
 				bufferLen = (maxMem * (1024 * 1024)) / (imageInfo.size * 3);
 				undoBuffer = (Pixel **)malloc(sizeof(Pixel **) * bufferLen); /*lefoglal egy annyi elemű tömböt, ahányszor a kép belefér az általunk meghatározott maximális ramhasználatba*/
+				if (undoBuffer == NULL){
+					pushmsg("couldn't allocate memory");
+					return 1;
+				}
 				for (int i = 0; i < bufferLen; i++){
 					undoBuffer[i] = NULL;
 				}
                 Pixel *img = (Pixel *) malloc(sizeof(Pixel) * imageInfo.size);
 				undoBuffer[0] = img;
 
-				if (undoBuffer[0] == NULL)
-					printf("couldn't allocate memory");
+				if (undoBuffer[0] == NULL){
+					pushmsg("couldn't allocate memory");
+					return 1;
+				}
 
 			PPM_LoadImageToArray(fp, imageInfo, undoBuffer[0]);
 			}
@@ -153,8 +159,8 @@ int main(int argc, char *argv[]){
 
 		strcpy(command, "");
 		strcpy(parameter, "");
-	}
 
+	}
 	for (int i = 0; i <= currStep; ++i){
 		free(undoBuffer[i]);
 	}

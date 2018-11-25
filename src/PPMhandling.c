@@ -31,6 +31,10 @@ void PPM_LoadImageToArray(FILE *imgfile, Info imgInfo, Pixel *img){ //lefoglal e
 
 void PPM_NextStep(Info imgInfo, int currStep, Pixel **undoBuffer){
 	undoBuffer[currStep] = (Pixel *) malloc(sizeof(Pixel) * imgInfo.width * imgInfo.height);
+	if (undoBuffer[currStep] == NULL){
+		pushmsg("couldn't allocate memory");
+		exit(1);
+	}
 	for (int i = 0; i < imgInfo.width; ++i)
 		for (int j = 0; j < imgInfo.height; ++j)
 			undoBuffer[currStep][i * imgInfo.height + j] = undoBuffer[currStep-1][i * imgInfo.height + j];
@@ -171,8 +175,16 @@ Pixel AvgConvMtx(int step, Pixel **tmp, int x, int y, Info imageInfo){
 
 void PPM_Blur(int size, Pixel *img, Info imgInfo){
 	Pixel **temp = (Pixel **) malloc(sizeof(Pixel *) * imgInfo.height);
+	if (temp == NULL){
+		pushmsg("couldn't allocate memory");
+		exit(1);
+	}
 	for (int i = 0; i < imgInfo.height; i++){
 		temp[i] = malloc(sizeof(Pixel) * imgInfo.width);
+		if (temp[i] == NULL){
+			pushmsg("couldn't allocate memory");
+			exit(1);
+		}
 	}
 
 	CopyToTemp(temp, imgInfo, img);
