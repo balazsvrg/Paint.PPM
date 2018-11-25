@@ -20,6 +20,7 @@ void Contrast(char *mustTakeArgument,  int currStep, Info boolimgInfo, Pixel **u
 void Blur(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer);
 void Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer);
 void Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer);
+void Help(char *NotUsed,  int NotUsed2, Info NotUsed3, Pixel **NotUsed4);
 void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer);
 
 #endif

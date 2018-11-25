@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "../include/updates.h"
 #include "../include/PPMhandling.h"
@@ -134,45 +135,65 @@ void PPM_Contrast(Pixel *img, Info imgInfo){
 		pushmsg("Contrast cannot be stretched, as this is a monochrome picture");
 }
 
-void CopyToTemp(Pixel *temp, Info imgInfo, Pixel *from){
-	for (int i = 0; i < imgInfo.size; ++i){
-		temp[i] = from[i];
+void CopyToTemp(Pixel **temp, Info imgInfo, Pixel *from){
+	for (int i = 0; i < imgInfo.height; i++){
+		for (int j = 0; j < imgInfo.width; j++){
+			temp[i][j] = from[imgInfo.height * i + j];
+		}
 	}
+
 }
 
-Pixel AvgConvMtx(int rect, Pixel *tmp, int count, Info imageInfo){
-	int rval;
-	int gval;
-	int bval;
+Pixel AvgConvMtx(int step, Pixel **tmp, int x, int y, Info imageInfo){
 
 	Pixel ToReturn;
 
-	for (int i = rect; i < rect; ++i){
-		for (int j = rect; j < rect; ++j){
-			if ((count + j) % imageInfo.width == count % imageInfo.width){ // ha nem lóg ki oldalra
-				if (count - imageInfo.width * i > 0 || count + imageInfo.width * i < imageInfo.height ){ //és függőlegesen sem
-					int coord = count - j - imageInfo.width * i;
-					rval += tmp[coord].r;
-					gval += tmp[coord].g;
-					bval += tmp[coord].b;
+	int rval = 0;
+	int gval = 0;
+	int bval = 0;
+
+	for (int i = -step; i <= step; ++i){
+		for (int j = -step; j <= step; ++j){
+			if (y + i >= 0 && y + i < imageInfo.height){
+				if (x + j >= 0 && x + j < imageInfo.width){
+					rval += (tmp[y + i][x + j].r);
+					gval += (tmp[y + i][x + j].g);
+					bval += (tmp[y + i][x + j].b);
 				}
 			}
 		}
 	}
 
-	ToReturn.r = rval / (count * count);
-	ToReturn.g = gval / (count * count);
-	ToReturn.b = bval / (count * count);
+	ToReturn.r = rval / pow(step * 2 + 1, 2);
+	ToReturn.g = gval / pow(step * 2 + 1, 2);
+	ToReturn.b = bval / pow(step * 2 + 1, 2);
 
 	return ToReturn;
 }
 
 void PPM_Blur(int size, Pixel *img, Info imgInfo){
-	Pixel *temp = (Pixel *) malloc(sizeof(Pixel) * imgInfo.size);
-	CopyToTemp(temp, imgInfo, img);
-	for (int i = 0; i < imgInfo.size; ++i){
-		img[i] = AvgConvMtx(size, temp, i, imgInfo);
+	Pixel **temp = (Pixel **) malloc(sizeof(Pixel *) * imgInfo.height);
+	for (int i = 0; i < imgInfo.height; i++){
+		temp[i] = malloc(sizeof(Pixel) * imgInfo.width);
 	}
+	CopyToTemp(temp, imgInfo, img);
+	for (int y = 0; y < imgInfo.height; y++){
+		for (int x = 0; x < imgInfo.width; x++){
+			img[y * imgInfo.height + x] = AvgConvMtx(size, temp, x, y, imgInfo);
+
+		}
+	}
+	CopyToTemp(temp, imgInfo, img);
+	for (int x = 0; x < imgInfo.width; x++){
+		for (int y = 0; y < imgInfo.height; y++){
+			img[y * imgInfo.height + x] = AvgConvMtx(size, temp, x, y, imgInfo);
+		}
+	}
+/*
+	for (int i = 0; i < imgInfo.height; i++)
+		free(temp[i]);
+
+	free(temp);*/
 }
 
 

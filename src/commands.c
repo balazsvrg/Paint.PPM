@@ -129,6 +129,30 @@ void Save(char *path, int currStep, Info imgInfo, Pixel **undoBuffer){
 	}
 }
 
+void Help(char *NotUsed,  int NotUsed2, Info NotUsed3, Pixel **NotUsed4){
+	FILE *fp;
+	#ifdef __linux
+	fp = fopen("helptextlin", "r");
+	#endif
+	#ifndef __linux
+	fp = fopen("..\\helptextwin.txt", "r");
+	#endif
+	if (fp == NULL)
+		pushmsg("cannot open helpfile");
+
+	else{
+		putchar('\n');
+		char c = fgetc(fp);
+		while(c != EOF){
+			putchar(c);
+			c = fgetc(fp);
+		}
+		putchar('\n');
+
+		fclose(fp);
+	}
+}
+
 void ExitProgram(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){ //kilép a programból (megszakítja a végtelen ciklust)
 
 	for (int i = 0; i <= currStep; ++i){

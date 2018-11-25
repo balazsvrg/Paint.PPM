@@ -39,7 +39,9 @@ int main(int argc, char *argv[]){
                            		{.id = "undo", .func = &Undo},
                                 {.id = "exit", .func = &ExitProgram},
                                 {.id = "save", .func = &Save},
+                                {.id = "help", .func = &Help},
                            		{.id = "end", .func = NULL}};
+
 
 	if ((argc == 2 && strcmp(argv[1], "help") != 0) || argc == 4 || argc == 5){
 		FILE *fp;
@@ -67,8 +69,10 @@ int main(int argc, char *argv[]){
 
 			fclose(fp);
 		}
-		else
+		else{
 			pushmsg("Error opening image");
+			exit(1);
+		}
 
 		if (argc == 4 || argc == 5){
 			char *commandin = argv[2];
@@ -95,8 +99,14 @@ int main(int argc, char *argv[]){
 			return 0;
 		}
 	}
+
+	else if (argc == 2 && strcmp(argv[1], "help") == 0){
+		Help(NULL, 0, imageInfo, undoBuffer);
+		exit(0);
+	}
+
 	else{
-		pushmsg("argument <image> or <image> <operation> or <image> <operation> <amount> required");
+		pushmsg("arguments <path> or <path> <command> <savepath> or <path> <command> <parameter> <savepath> required");
 		exit(1);
 	}
 
@@ -140,6 +150,8 @@ int main(int argc, char *argv[]){
 		if (cmd_ptr != NULL)
 			(*cmd_ptr)(parameter, currStep, imageInfo, undoBuffer);
 
+		strcpy(command, "");
+		strcpy(parameter, "");
 	}
 
 	free(undoBuffer);
