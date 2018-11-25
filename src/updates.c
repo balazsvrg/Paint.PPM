@@ -8,7 +8,7 @@
 #include "../include/PPMhandling.h"
 
 void pushmsg(char *msg){ /*kiír a stdout-ra egy Paint.PPN taggal*/
-    printf("Paint.PPM: %s\n", msg);
+    fprintf(stderr, "Paint.PPM: %s\n", msg);
 }
 
 #ifdef __linux /*szintén SDL-es függvények szóval windowson nem kéne lefordítani*/

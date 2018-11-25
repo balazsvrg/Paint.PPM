@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>A környezet</title>
+</head>
+<body>
+	<h1>A környezet</h1>
+	<h2>Külső könyvtár: SDL</h2>
+	<p>SDL-t használ linuxon a kép kirajzolására a folyamatos kommandsoros futtatás közben. Az SDL kommunikáció <a href="https://wiki.libsdl.org/">itt</a> érhető el. Windowson ezek a kódrészletek, mivel nem ez volt az elsődleges funkció és nem jutott idő a helyes implementálásukra, szándékosan (#ifndef __linux) nem fordulnak le, de a program fő funkciói így is elérhetőek.</p>
+	<h3>A fordítás menete</h3>
+	<p>A makefile template amit használtam megtalálható a projektmappában. Egyenként lefordítja a négy .c fájlt a saját.o fájlba, majd ezeket a <i>/bin</i>mappában linkeli össze egy executable-be.
+
+	<h2>A projekt felépítése</h2>
+	<h3>A projektmappa</h3>
+	<p>A projektmappa az általános C, C++ projektekhez használt struktúrájú. A <i>/bin</i> mappa tartalmazza a futtatható fájlokat. A <i>/obj</i> mappa a ".o" fájlokat tartalmazza (ezeket linkeli a fordító, hogy futtatható fájlt kapjunk). A source (.c) fájlok a <i>/src</i> mappába, míg a header (.h) fájlok a <i>/include</i> mappába kerülnek. A dokumentációt a <i>/doc</i> mappa tartalmazza</p>
+	<h3>main.c</h3>
+	<p>A main fontos váltózói a header alatt vannak deklarálva. Egyetlen globális változót használ, egy "run" nevű bool-t, amely azt határozza meg, hogy meddig fusson a folyamatos kommandsoros futtatás.</p>
+	<p>Nagyon fontos változó a <b>commandList</b>. Ez egy olyan tömb ami a bemenetre kapott lehetséges inputokhoz rendel egy-egy függvényhez tartozó memóriaterületet. Új funkció hozzáadása úgy történik a programhoz, hogy a <i>commands.c</i>-ben megírjuk a parancs viselkedését (figyeljünk, ha a képet is szerkeszti, akkor az innen tovább kell adni a <i>PPMhandling.c</i>-nek), majd a <b>commandList</b> végjele elé beszúrjuk egy általunk meghatározott input sztringgel, amire reagál.</p>
+	<p>A <b>cmd_ptr</b> egy függvénypointer, ami négy argumentet vár. Minden egyes input után kikeresi azt az elemét a <b>commandList</b>-nek amely .id-jével megegyezik az input és az ezen az elemen tárolt memóriacímen található függvényt futtatja. (ezt elegánsabb megoldásnak találtam, mint egy soksoros switch szerkezetet.</p>
+	<h5>A futtatás módjának meghatározása</h5>
+	<p>A programot kétféleképpen futtathatjuk. Ha csak a kép helyét adjuk meg paraméternek, akkor <b>argc</b> 2 lesz és tudjuk hogy a folyamatosan kommandokat kérő while loopot kell futtatnunk.<br>
+	Ha 3, vagy 4 paramétert kapunk akkor ez azt jelenti, hogy a program egysoros futtatását választotta a felhasználó, így <b>argv[3]</b>a kívánt kommandot fogja tartalmazni, <b>argv[4]</b> pedig <b>argv[5]</b> létezésétől függően vagy a menteni kívánt helyet, vagy paramétert tárol, <b>argv[5]</b> pedig ha létezik, útvonalat tárol ahova mentünk. A megfelelő vezérlési szerkezetekkel kiválasztható, hogy melyik futtatási módot próbálja használni a felhasználó</p>
+	<p>Folyamatos futtatás esetén mindig megkeressük, hanyadik műveletet hajtja végre a felhasználó. Ezt a <b>currStep</b> változóban tároljuk, ez alapján adjuk át az <b>undoBuffer</b> megfelelő elemét a képszerkesztésre. Amennyiben megtelik az <b>UndoBuffer</b>, a benne tárolt pointereket shifteljük eggyel hátra, hogy beleférjen az új elem. (ebben a folyamatban elveszítjük az utolsó állapotot, de felszabadítjuk a memóriaterületet).</p>
+	<h3>commands.c</h3>
+	<p>Ez a modul az inputként kapott kommandok kezelésével foglakozik néhány kommand viselkedése itt van leírva, ezek azok amelyek nem módosítanak a képen (az a PPMhandling.c feladata). Amik képfeldolgozó kommandok, azoknak csak ellenőrzi a paramétereit, és továbbadja a feladatot a PPMhandling.c-nek. Mivel a <b>cmd_ptr</b> egységes argumenteket képes átadni, minden ez által meghívott függvény megkapja a paraméter sztringet, a <b>currStep</b>-et, az <b>imageInfo</b>-t és az <b>undoBuffer</b>-t. Ezután maga dönti el ebből mennyit használ fel. Mivel a képszerkesztő kommandokat nem ebben a modulban sok olyan kommand van amely csak eldönti, hogy helyes inputokat kapott-e és továbbadja egy másik függvénynek a <b>PPMhandling.c</b>-ben. Ezeket a füffvényeket külön nem fogom részletezni itt, majd később a tényleges feladatot ellátó párjukat.</p>
+	<h5>GetCommand:</h5>
+	<p>Beolvas egy sornyi karaktert és stringként elmenti (nem hagy \n-t a stdin-en). Azért használok saját függvényt erre, mert a stdin-en hagyott \n-ek az infoC-n található módszerekkel sem viselkedtek úgy, ahogy szerettem volna</p>
+	<h5>SeparateCommandLine:</h5>
+	<p>Szétszedi az input sztringet egy commandra meg a paraméterre (amennyiben szóközzel vannak elválasztva)</p>
+	<h5>InterpretCommand:</h5>
+	<p>Kikeresi a kommandlistából az inputtal egyező kommandot, és visszatér a kommand viselkedését leíró függvény memóriacímével</p>
+	<h5>Undo:</h5>
+	<p>Az <b>undoBuffer</b> aktuális előtti elemét NULLra állítja, így amikor a következő input előtt kikeressük a <b>currStep</b>-et az az előző képre fog mutatni, így visszavonva az utolsó operációt.</p>
+	<h5>Save:</h5>
+	<p>Megnyit egy fájlt a paraméterként kapott helyen, és feltölti a PPM specifikációval megegyező módon (ezt később tárgyalom)</p>
+	<h5>Help:</h5>
+	<p>Létezik egy (illetve kettő, külön windowsos és linuxos, a sorvége jelek miatt) helptext fájl, ennek a tartalmát írja ki a stdout-ra.</p>
+	<h5>ExitProgram:</h5>
+	<p>A run változót falsra állítva megszakítja a main ciklust.</p>
+	<h3>PPMHandling.C</h3>
+	<p> Ez a modul foglalkozik a PPM képek változtatásával, betöltésével.</p>
+	<h5>IsPPM</h5>
+	<p>jelez, ha rossz formátumú képet próbálnánk megnyitni, az alapján, hogy a raw PPM-fájlok MagicNuber-je P6</p>
+	<h5>PPM_GetInfo</h5>
+	<p>Kiolvassa az adatokat a PPM fileheader-ből és visszatér velük egy Info tipusú változóban</p>
+	<h5>PPM_LoadImageToArray</h5>
+	<p>az fgetc függvényt használva feltölti a tömböt amiben a képet tároljuk. Egydimenziós tömbben tároljuk a képeket az egyszerűség kedvéért</p>
+	<h5>PPM_Nextstep</h5>
+	<p>Következő képfeldolgozó művelet inicializálása. Új tömb lefoglalása a megfelelő helyen, és az előző lépés bemásolása abba.</p>
+	<h5>PPM_Darken</h5>
+	<p>A kép sötétítése úgy, hogy pixelenként minden R, G, és B értéket az inputban kapott mennyiséggel csökkenti. Ha bármelyik minuszba menne, helyette nullára állítja</p>
+	<h5>PPM_Lighten</h5>
+	<p>Világosítja a képet úgy, hogy pixelenként minden R, G, és B értéket az inputban kapott mennyiséggel növeli. Ha bármelyik 255 fölé menne, helyette 255re állítja.</p>
+	<h5>PPM_Invert</h5>
+	<p>Negálja az RGB értékeket, ezzel negatív effektet okozva a képen.</p>
+	<h5>PPM_Greyscale</h5>
+	<p>Egyenlővé téve az R G éb B értékeket, a kép fekete-fehérnek tűnik. Valamiért szerintem jobb a sima átlagolás mint a  0.2989, 0.5870, 0.1140 súlyozás szóval maradt az.</p>
+	<h5>PPM_Contrast</h5>
+	<p>A lehető legszélesebbre állítja a kép kontrasztját. Ha abszolút minimumot és maximumot vennénk a pixelértékekből akkor ha a képen lenne egyetlen fekete és fehér pixel, az algoritmus azt hinné hogy a kép telhesen kihasználja a 0-255ös színspektrumot. Ezt kiküszöbölendő létrehozunk egy histogram tömböt amiben eltároljuk hogy hány pixel veszi fel a képen az adott értéket, és a kilógó értékeket így ignorálni tudjuk. Az <b>img[i].RGB</b> mindig a histogram egyik indexének felel meg, és ezt növeljük ha találunk egy pixelt ezzel az értékkel. A histogram feltöltésével a <i>FillHistogram</i> függvény foglalkozik, ez a blur egyik szubrutinja. <br>
+	A kilógó értékek ignorálásához "deriválunk". két pixelérték között a Histogram meredeksége magától értetődően a két érték különbsége. Ha ez egy bizonyos értéknél nagyobb, akkor azt jogosan nézhetjük annak, hogy itt kezdődik a releváns adathalmaz, ugyanis kilógó értékekből nem jellemző hogy sok található. A relatív min és max értékek keresésével a leírt módon a <i>FindRelMin</i> és <i>FindRelMax</i> függvények foglalkoznak. A pixelek új értékeit a következőképp számoljuk ki: ÚJÉRTÉK = 255 * (img[i].r - min) / (max - min)</p>
+	<h5>PPM_Blur:</h5>
+	<p>Egy képet úgy homályosítunk, hogy átlagoljuk a pixeleit körülvevő terület RGB értékeit. Ez a funkció jelenleg hibásan működik! Próbálkoztam Gauss-kerneles súlyozással, de kivettem mert egyenlőre egy debughoz átláthatóbb ha nincs ott. Sajnos nem tudtam megállapítani mi a pontos hiba néhány képen teljesen jó, valamelyiken meg értékelhetetlenül működik.<br>
+	azért, hogy a már homályosított értékű pixelek ne hassanak ki azokra aminek éppen az értékét számoljuk, készítünk egy másolatot a képről és ezen végezzük a vltoztatásokat. Ez a feladat a <i>CopyToTemp</i> függvény feladata. A képeket körülvevő pixelek átlagolásával az <i>AvgConvMtx</i> függvény foglalkozik, ügyelve, hogy azokat a pixeleket az átlagolásban amiknek indexe kívül esne a kép méretein, ne számolja, ne legyen túlindexelés. Az indexelést megkönnyítendő, a <b>temp</b> kép duplán mallocolt, kétdimenziós tömb.</p>
+	<h2>updates.c</h2>
+	<p>Itt található a <b>pushmsg</b> függvény amit hibaüzenetek közlésére használok (nem perror, hogy megtarthassam a Paint.PPM taget), Ezenkívül linuxon innen fordulnak le az SDL ablakot megnyitó, feltöltő és updatelő függvények.</p>
+	<a href="index.html">Tartalomjegyzék</a>
+	<a href="adatszerkezetek.html">Tovább</a>
+</body>
+</html>

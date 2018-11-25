@@ -226,5 +226,3 @@ void PPM_Blur(int size, Pixel *img, Info imgInfo){
 
     free(temp);
 }
-
-

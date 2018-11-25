@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Adatszerkezetek</title>
+</head>
+<body>
+	<h1>Adatszerkezetek</h1>
+	<h3>UndoBuffer és Képek tárolása</h3>
+	<p>Minden kép egy <b>Pixel</b> nevű struktúrákból álló tömb. A <b>Pixel</b> struktúra három <i>unsigned char</i> tipusú változóból áll, ebben RGB adatot tárol. Azért <i>char</i> mert ez pont egy bájtos. A kép adatait (szélesség, magasság, méret, maximum színérték) egy <b>Info</b> nevű struktúrában tárolom, integerekben. A méret alapján foglalok memóriaterületet, amibe belefér a teljes kép, majd az erre mutató pontert eltárolom a Pixel **tipusú szintén dinamikusan lefoglalt tömbnek a megfelelő indexén. Erre azért van szükség, hogy az aktuálisan szerkesztett állapot helyett egy régebbit is elő lehessen hívni, ezzel visszavonva a változtatásainkat.<br>
+	Az undobuffer méretét úgy határozzuk meg, hogy egy változóban eltároljuk a maximális memóriát amit használni kívánunk (én ezt 64 MB-ra állítottam), és annyi elemű tömbnek foglalunk helyet, ahányszor a megnyitott kép belefér ebbe a területbe. </p>
+	<h3>Command</h3>
+	<p>Egy olyan struktúra, ami tárolja egy id sztringben a kommand eléréséhez begépelendő szöveget, és egy pointert ami a kommand viselkedését leíró függvényre mutat</p>
+	<h3>Histogram</h3>
+	<p>A <i>PPMhandling</i> modul által használt struktúra. három 256 elemű tömbből áll amely az külön külön tárolja az R G és B histogramot.</p>
+	<h4>Helptext fájlok</h4>
+	<p>Ezek a fájlok tartalmazzák a help kommandok által kiírt szöveget. Külön fájlt csináltam linuxra és Windowsra, hogy semmiképp se adódjon probléma a sorvége jelek különbözőségéből</p>
+	<a href="A kornyezet.html">Vissza</a>
+	<a href="index.html">Tartalomjegyzék</a>
+</body>
+</html>

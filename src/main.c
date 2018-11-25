@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
             return 1;
         }
 
-        if (argc == 4 || argc == 5){     /*egyetlen kommanddal duttatja a programot és elmenti egyből a változtatást*/
+        if (argc == 4 || argc == 5){     /*egyetlen kommanddal futtatja a programot és elmenti egyből a változtatást*/
             char *commandin = argv[2];   /*a paraméterként kapott kommandot a program neve mellé kell írni*/     
             char *parameter = NULL;      /*csak akkor van paraméter ha a kommand azt igényli*/
 

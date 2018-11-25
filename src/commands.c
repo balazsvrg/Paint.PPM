@@ -123,8 +123,10 @@ void Blur(char *amount,  int currStep, Info imgInfo, Pixel **undoBuffer){
 }
 
 void Undo(char *mustTakeArgument,  int currStep, Info imgInfo, Pixel **undoBuffer){
-    if (currStep != 1)
+    if (currStep != 1){
+        free(undoBuffer[currStep-1]);
         undoBuffer[currStep -1] = NULL;
+    }
 
     else
         pushmsg("undo buffer is empty");
