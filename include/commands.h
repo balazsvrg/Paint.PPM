@@ -4,9 +4,9 @@
 #include "PPMhandling.h"
 #include <stdbool.h>
 
-typedef struct Command{
-	char id[20];
-	void *func;
+typedef struct Command{ /*a kommandlista elemeinek tipusa*/
+    char id[20];
+    void *func;
 }Command;
 
 void GetCommand(char *);

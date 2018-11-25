@@ -1,10 +1,10 @@
->darken <amount>  		-sotetiti a kepet <amount> mennyiseggel. 	[0 < amount < 255]
->brighten <amount>		-vilagositja a kepet <amount> mennyiseggel 	[0 < amount < 255]
->invert					-negativ effekt								
->greyscale				-fekete feher effekt						
->contrast				-az adatveszteseg nelkuli lehetseges maximumra emeli a kontrasztot
->blur					-homalyositja a kepet
->undo					-utolso valtoztatas visszavonasa
->save <path>				-elmenti a kepet <path> altal meghatarozott helyre
->exit					-kilep a programbol
->help					-betolti ezt a szoveget
+>darken <amount>        -sotetiti a kepet <amount> mennyiseggel.    [1 < amount < 255]
+>brighten <amount>      -vilagositja a kepet <amount> mennyiseggel  [1 < amount < 255]
+>invert	                -negativ effekt								
+>greyscale              -fekete feher effekt						
+>contrast               -az adatveszteseg nelkuli lehetseges maximumra emeli a kontrasztot
+>blur <amount>          -homalyositja a kepet                       [1 < amount < 10]
+>undo                   -utolso valtoztatas visszavonasa
+>save <path>            -elmenti a kepet <path> altal meghatarozott helyre
+>exit                   -kilep a programbol
+>help                   -betolti ezt a szoveget
